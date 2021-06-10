@@ -1,7 +1,10 @@
 import os
 from datetime import datetime
 
-from pymongo import MongoClient
+try:
+    from pymongo import MongoClient
+except ImportError:
+    pass
 
 
 class Datastore:

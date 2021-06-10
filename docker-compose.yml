@@ -7,14 +7,14 @@ services:
       volumes:
         - ./NGINX/nginx.conf:/etc/nginx/nginx.conf
       depends_on:
-        - learning-service
+        - backend-service
         - mongodb
       ports:
        - 80:80
       #restart: on-failure
       networks:
        - traffic_net
-       
+
     mongodb:
         image: mongo
         container_name: mongodb
@@ -30,11 +30,11 @@ services:
         networks:
           - traffic_net
 
-    learning-service:
-        build: 
-          context: ./service
-        image: learning_service:latest
+    backend-service:
+        image: mershab99/euro2020betting
         environment:
+          - ADMIN_USERNAME=admin
+          - ADMIN_PASSWORD=euro2020
           - MONGO_HOST=mongodb
           - MONGO_PORT=27017
           - MONGO_USERNAME=euro2020
@@ -42,6 +42,7 @@ services:
           - LOG_FOLDER=/logs
           - MONGO_DB=dev
           - PORT=8000
+          - ROSTER_URL=https://soccer.nbcsports.com/2021/06/08/euro-2020-squads-full-list-details-confirmed/
         volumes:
             - ./service:/code
             - /data/logs/api:/logs
