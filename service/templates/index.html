@@ -1,14 +1,21 @@
 <html>
 <head>
-<title>Home</title>
+    <title>TTM EURO 2020 Pool!</title>
 </head>
 <body>
-<h1>TTM Euro 2020 Pool</h1>
-<h1>Teams</h1>
+<h1 style="text-align: center;">TTM Euro 2020 Betting Pool</h1>
+<h2>Teams</h2>
 {{ team_table }}
-<h1>Top Scorers</h1>
+<h2>Top Scorers</h2>
 {{ player_table }}
-<h1>Your Scores</h1>
+<h2>Your Scores</h2>
 {{ user_table }}
+<form action="/admin/" method="post">
+    <label for="username">Username:</label><br>
+    <input type="text" id="username" name="username"><br>
+    <label for="password">Password:</label><br>
+    <input type="text" id="password" name="password">
+    <button type="submit" id="btn_submit" name="submit">Admin Login</button>
+</form>
 </body>
 </html>

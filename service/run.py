@@ -2,9 +2,12 @@ import logging
 import os
 from datetime import datetime as dt
 
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, redirect
 from flask_cors import CORS
 from flask_restful import Api
+
+ADMIN_USER = os.environ['ADMIN_USERNAME']
+ADMIN_PASSWORD = os.environ['ADMIN_PASSWORD']
 
 app = Flask(__name__)
 app.logger.setLevel(logging.DEBUG)
@@ -53,6 +56,23 @@ def home():
     return render_template('index.html', team_table=populate_team_table(), user_table=populate_user_table(),
                            player_table=populate_top_scorer_table())
 
+
+@app.route('/admin/', methods=['POST'])
+def admin():
+    username = request.form['username']
+    password = request.form['password']
+    if username == ADMIN_USER and password == ADMIN_PASSWORD:
+        return render_template('admin.html')
+    else:
+        return redirect('/')
+
+
+@app.route('/admin-post/', methods=['POST'])
+def admin_post():
+    if 'create_user' in request.form:
+        return render_template('create_user.html')
+    elif 'report_scores' in request.form:
+        return render_template('report_scores.html')
 
 api = Api(app)
 

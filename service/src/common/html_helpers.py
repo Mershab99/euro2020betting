@@ -1,7 +1,7 @@
 from flask_table import Table, Col
 
 from src.core.managers.mgr_scores import get_all_team_stats, get_all_player_stats
-from src.core.managers.mgr_user import get_all_user_scores
+from src.core.managers.mgr_user import get_all_user_stats
 
 
 class TeamTable(Table):
@@ -19,6 +19,8 @@ class UserTable(Table):
     first_name = Col('first_name')
     last_name = Col('last_name')
     score = Col('score')
+    teams = Col('teams')
+    player = Col('player')
 
 
 def populate_team_table():
@@ -35,6 +37,6 @@ def populate_top_scorer_table():
 
 
 def populate_user_table():
-    stats = get_all_user_scores()
+    stats = get_all_user_stats()
     table = UserTable(stats)
     return table

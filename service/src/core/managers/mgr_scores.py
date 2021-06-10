@@ -124,4 +124,8 @@ def get_all_player_stats():
     return [player for player in player_ds.get_all_players()]
 
 
+def get_player(player):
+    return player.get_player(player)
+
+
 populate_mongo_with_teams()

@@ -40,7 +40,7 @@ class UserDataStore(Datastore):
             raise KeyError('invalid user')
 
     def get_all_users(self):
-        return self.collection.find({})
+        return self.collection.find({}, {'_id': 0})
 
 
 user_ds = UserDataStore()
@@ -54,7 +54,7 @@ def get_user_score(first_name, last_name):
     user = user_ds.get_user(first_name, last_name)
 
 
-def get_all_user_scores():
+def get_all_user_stats():
     all_users = user_ds.get_all_users()
     all_team_scores = get_all_team_scores()
     user_list = []
@@ -62,11 +62,7 @@ def get_all_user_scores():
         user_score = 0
         for team in user['teams']:
             user_score += all_team_scores[team]
-            # Player score
-            # user_score +=
-        user_list.append({
-            'first_name': user['first_name'],
-            'last_name': user['last_name'],
-            'score': user_score
-        })
+        user_list.append({**user, **{
+            'score': user_score,
+        }})
     return user_list
