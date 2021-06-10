@@ -45,12 +45,13 @@ if 'LOG_FOLDER' in os.environ:
         )
         return response
 
-from src.common.html_helpers import populate_team_table, populate_user_table
+from src.common.html_helpers import populate_team_table, populate_user_table, populate_top_scorer_table
 
 
 @app.route('/')
 def home():
-    return render_template('index.html', team_table=populate_team_table(), user_table=populate_user_table())
+    return render_template('index.html', team_table=populate_team_table(), user_table=populate_user_table(),
+                           player_table=populate_top_scorer_table())
 
 
 api = Api(app)
