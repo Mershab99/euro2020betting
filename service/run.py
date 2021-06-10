@@ -1,10 +1,8 @@
 import logging
 import os
-from datetime import datetime as dt
 
 from flask import Flask, request, render_template, redirect
 from flask_cors import CORS
-from flask_restful import Api
 
 ADMIN_USER = os.environ['ADMIN_USERNAME']
 ADMIN_PASSWORD = os.environ['ADMIN_PASSWORD']
@@ -13,42 +11,9 @@ app = Flask(__name__)
 app.logger.setLevel(logging.DEBUG)
 app.logger.info("Enabling CORS...")
 CORS(app)
-if 'LOG_FOLDER' in os.environ:
-    app.config["LOG_TYPE"] = os.environ.get("LOG_TYPE", "file")
-    app.config["LOG_LEVEL"] = os.environ.get("LOG_LEVEL", "INFO")
 
-    # File Logging Setup
-    app.config['LOG_DIR'] = os.environ.get("LOG_FOLDER", "/")
-    app.config['APP_LOG_NAME'] = os.environ.get("APP_LOG_NAME", "default.log")
-    app.config['WWW_LOG_NAME'] = os.environ.get("WWW_LOG_NAME", "default_www.log")
-    app.config['LOG_MAX_BYTES'] = os.environ.get("LOG_MAX_BYTES", 500_000_000)  # 100MB in bytes
-    app.config['LOG_COPIES'] = os.environ.get("LOG_COPIES", 5)
-
-    from src.common.flask_logs import LogSetup
-
-    logs = LogSetup()
-    logs.init_app(app)
-
-
-    @app.after_request
-    def after_request(response):
-        """ Logging after every request. """
-        logger = logging.getLogger("app.access")
-        logger.info(
-            "%s [%s] %s %s %s %s %s %s %s",
-            request.remote_addr,
-            dt.utcnow().strftime("%d/%b/%Y:%H:%M:%S.%f")[:-3],
-            request.method,
-            request.path,
-            request.scheme,
-            response.status,
-            response.content_length,
-            request.referrer,
-            request.user_agent,
-        )
-        return response
-
-from src.common.html_helpers import populate_team_table, populate_user_table, populate_top_scorer_table
+from src.common.html_helpers import populate_team_table, populate_user_table, populate_top_scorer_table, \
+    populate_player_list, populate_team_list
 
 
 @app.route('/')
@@ -70,11 +35,54 @@ def admin():
 @app.route('/admin-post/', methods=['POST'])
 def admin_post():
     if 'create_user' in request.form:
-        return render_template('create_user.html')
+        return render_template('create_user.html', players=populate_player_list(), teams=populate_team_list())
     elif 'report_scores' in request.form:
-        return render_template('report_scores.html')
+        return render_template('report_scores.html', players=populate_player_list(), teams=populate_team_list())
 
-api = Api(app)
+
+from src.core.managers.mgr_user import create_user
+from src.core.managers.mgr_scores import increment_team_win, increment_team_draw, increment_player_goals
+
+
+@app.route('/create-user-post/', methods=['POST'])
+def create_user_post():
+    data = request.form
+    try:
+        create_user(first_name=data['first_name'], last_name=data['last_name'],
+                    teams=[data['team1'], data['team2'], data['team3']],
+                    player=data['player'])
+        return {
+            'message': 'success'
+        }
+    except Exception:
+        return {
+            'message': 'failure'
+        }
+
+
+@app.route('/report/', methods=['POST'])
+def report_player_score():
+    data = request.form
+    if 'player_scored' in data and data['player_scored'] is not None:
+        increment_player_goals(data['player'])
+        return {
+            'message': 'success'
+        }
+    elif 'win' in data.keys() and data['win'] is not None:
+        val = increment_team_win(team=data['team'])
+        return {
+            'message': 'success'
+        }
+    elif 'draw' in data.keys() and data['draw'] is not None:
+        increment_team_draw(team=data['team'])
+        return {
+            'message': 'success'
+        }
+
+    return {
+        'message': 'failure'
+    }
+
 
 # MONGO DRIVER CODE
 app.config['MONGODB_SETTINGS'] = {
@@ -83,13 +91,6 @@ app.config['MONGODB_SETTINGS'] = {
                 'MONGO_DB'] + '?authSource=admin',
     'db': 'social'
 }
-
-from src.resources import status, user
-
-# Resources
-api.add_resource(status.Status, '/status')
-api.add_resource(user.CreateUser, '/create-user')
-api.add_resource(user.Login, '/admin/login')
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get("PORT", 8000)))

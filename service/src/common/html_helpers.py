@@ -29,11 +29,19 @@ def populate_team_table():
     return table
 
 
+def populate_team_list():
+    return [team['name'] for team in get_all_team_stats()]
+
+
 def populate_top_scorer_table():
     stats = get_all_player_stats()
     sorted_stats = sorted(stats, key=lambda i: i['goals'], reverse=True)[0:20]
     table = PlayerTable(sorted_stats)
     return table
+
+
+def populate_player_list():
+    return [player['name'] for player in get_all_player_stats()]
 
 
 def populate_user_table():

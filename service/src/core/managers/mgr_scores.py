@@ -11,7 +11,26 @@ class TeamsDataStore(Datastore):
         super().__init__('teams')
 
     def get_teams(self):
-        return self.collection.find_one({})
+        return self.collection.find({})
+
+    def increment_win(self, team_name):
+        team = self.collection.find_one({
+            'name': team_name
+        })
+        team['wins'] += 1
+
+        return self.collection.update_one({
+            'name': team_name
+        }, {'$set': team})
+
+    def increment_draw(self, team_name):
+        team = self.collection.find_one({
+            'name': team_name
+        })
+        team['draws'] += 1
+        return self.collection.update_one({
+            'name': team_name
+        }, {'$set': team})
 
 
 class PlayerDatastore(Datastore):
@@ -49,7 +68,7 @@ class PlayerDatastore(Datastore):
 
             self.collection.update_one({
                 'name': player
-            }, current_player)
+            }, {'$set': current_player})
 
     def get_all_players(self):
         return self.collection.find({}, {'_id': 0})
@@ -70,7 +89,7 @@ def populate_mongo_with_players():
         import requests
 
         data = requests.get(ROSTER_URL).text
-        all_teams = teams_ds.get_teams()['data']
+        all_teams = teams_ds.get_teams()
         for team in all_teams:
             team_title = data.find("{} EURO 2020 squad".format(team['name']))
             gks = data.find("Goalkeepers", team_title)
@@ -101,15 +120,13 @@ def populate_mongo_with_teams():
                 'draws': 0
             })
     if teams_ds.collection.find_one({}) is None:
-        teams_ds.collection.insert_one({
-            'data': team_data
-        })
+        teams_ds.collection.insert_many(team_data)
 
 
 def get_all_team_scores():
     team_list = {}
     all_teams = teams_ds.get_teams()
-    for team in all_teams['data']:
+    for team in all_teams:
         point_map = team_scoring_map(team['name'])
         score = (point_map['win'] * team['wins']) + (point_map['draw'] * team['draws'])
         team_list[team['name']] = score
@@ -117,7 +134,15 @@ def get_all_team_scores():
 
 
 def get_all_team_stats():
-    return teams_ds.get_teams()['data']
+    return teams_ds.get_teams()
+
+
+def increment_team_win(team):
+    return teams_ds.increment_win(team)
+
+
+def increment_team_draw(team):
+    return teams_ds.increment_draw(team)
 
 
 def get_all_player_stats():
@@ -126,6 +151,10 @@ def get_all_player_stats():
 
 def get_player(player):
     return player.get_player(player)
+
+
+def increment_player_goals(player):
+    return player_ds.increment_player_goal(player)
 
 
 populate_mongo_with_teams()

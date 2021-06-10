@@ -4,5 +4,49 @@
 </head>
 <body>
 <h1 style="text-align: center;">Create User</h1>
+<form action="/create-user-post/" method="post">
+
+    <div>
+        <label for="first_name">First Name:</label>
+        <input type="text" id="first_name" name="first_name"><br>
+        <label for="last_name">Last Name:</label>
+        <input type="text" id="last_name" name="last_name">
+    </div>
+    <div>
+        <label for="player_select">Player:</label>
+        <select class="browser-default custom-select" id="player_select" name="player">
+            {% for player in players %}
+            <option value="{{player}}" SELECTED>{{player}}</option>
+            "
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <label for="team1_select">Team 1:</label>
+        <select class="browser-default custom-select" id="team1_select" name="team1">
+            {% for team in teams %}
+            <option value="{{team}}" SELECTED>{{team}}</option>
+            "
+            {% endfor %}
+        </select>
+        <label for="team2_select">Team 2:</label>
+        <select class="browser-default custom-select" id="team2_select" name="team2">
+            {% for team in teams %}
+            <option value="{{team}}" SELECTED>{{team}}</option>
+            "
+            {% endfor %}
+        </select>
+        <label for="team3_select">Team 3:</label>
+        <select class="browser-default custom-select" id="team3_select" name="team3">
+            {% for team in teams %}
+            <option value="{{team}}" SELECTED>{{team}}</option>
+            "
+            {% endfor %}
+        </select>
+    </div>
+    <div>
+        <button type="submit" id="btn_submit2" name="submit">Create User!</button>
+    </div>
+</form>
 </body>
 </html>

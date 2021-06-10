@@ -4,5 +4,35 @@
 </head>
 <body>
 <h1 style="text-align: center;">Report Scores</h1>
+
+<form action="/report/" method="post">
+    <div>
+        <label for="player_select">Player:</label>
+        <select class="browser-default custom-select" id="player_select" name="player">
+            {% for player in players %}
+            <option value="{{player}}" SELECTED>{{player}}</option>
+            "
+            {% endfor %}
+        </select>
+        <div>
+            <button type="submit" id="btn_player" name="player_scored">Scored!</button>
+        </div>
+    </div>
+    <div>
+        <label for="team_select">Team:</label>
+        <select class="browser-default custom-select" id="team_select" name="team">
+            {% for team in teams %}
+            <option value="{{team}}" SELECTED>{{team}}</option>
+            "
+            {% endfor %}
+        </select>
+        <div>
+            <button type="submit" id="btn_win" name="win">WIN!</button>
+        </div>
+        <div>
+            <button type="submit" id="btn_draw" name="draw">Draw</button>
+        </div>
+    </div>
+</form>
 </body>
 </html>
