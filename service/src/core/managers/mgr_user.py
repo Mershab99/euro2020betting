@@ -1,69 +1,72 @@
-from datetime import datetime
-
+from src.core.managers.mgr_scores import get_all_team_scores
 from src.mongo.datastore.datastore import Datastore
-
-class UserManager:
-
-    def __init__(self):
-        self.datastore = UserDataStore()
-
-    def login(self, email, password, loc):
-        return self.datastore.login(email, password, loc)
-
-    def create_user(self, email, name, password, loc):
-        return self.datastore.create_user(email, name, password, loc)
-
-    def update_user(self, email, name, password, loc):
-        return self.datastore.update_user(email, name, password, loc)
 
 
 class UserDataStore(Datastore):
     def __init__(self):
         super().__init__('users')
 
-    def __update_fields(self, email, fields_to_update):
-        return self.collection.update_one(
-            {'email': email},
-            {'$set': fields_to_update})
+    def __update_fields(self, first_name, last_name, fields_to_update):
+        return self.collection.update_one({
+            'first_name': first_name,
+            'last_name': last_name
+        }, {'$set': fields_to_update})
 
-    def create_user(self, email, name, password, loc):
+    def create_user(self, first_name, last_name, teams, player):
         existing_user = self.collection.find_one({
-            'email': email
+            'first_name': first_name,
+            'last_name': last_name
         })
         if existing_user:
-            raise KeyError("a user with email {} already exists".format(email))
+            raise KeyError("a user with that name already exists")
 
         user = self.collection.insert_one({
-            'email': email,
-            'name': name,
-            'password': password,
-            'last_login_location': loc,
-            'last_login_timestamp': datetime.now().__str__()
+            'first_name': first_name,
+            'last_name': last_name,
+            'teams': teams,
+            'player': player
         })
 
         return user is not None
 
-    def login(self, email, password, loc):
-        user = self.collection.find_one({
-            'email': email,
-            'password': password
+    def get_user(self, first_name, last_name):
+        existing_user = self.collection.find_one({
+            'first_name': first_name,
+            'last_name': last_name
         })
-        if user:
-            fields_to_update = {
-                'last_login_location': loc,
-                'last_login_timestamp': datetime.now().__str__()
-            }
-            self.update_fields(email, fields_to_update)
-            return True
+        if existing_user:
+            return existing_user
         else:
-            return False
+            raise KeyError('invalid user')
 
-    def update_user(self, email, name, password, loc):
-        fields_to_update = {
-            'email': email,
-            'name': name,
-            'password': password,
-            'last_login_location': loc,
-            'last_login_timestamp': datetime.now().__str__()
-        }
-        self.__update_fields(email, fields_to_update)
+    def get_all_users(self):
+        return self.collection.find({})
+
+
+user_ds = UserDataStore()
+
+
+def create_user(first_name, last_name, teams, player):
+    return user_ds.create_user(first_name, last_name, teams, player)
+
+
+def get_user_score(first_name, last_name):
+    user = user_ds.get_user(first_name, last_name)
+
+
+def get_all_user_scores():
+    all_users = user_ds.get_all_users()
+    all_team_scores = get_all_team_scores()
+    user_list = []
+    for user in all_users:
+        user_score = 0
+        for team in user['teams']:
+            user_score += all_team_scores[team]
+            # Player score
+            # user_score +=
+        user_list.append({
+            'first_name': user['first_name'],
+            'last_name': user['last_name'],
+            'score': user_score
+        })
+    return user_list

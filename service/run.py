@@ -2,11 +2,9 @@ import logging
 import os
 from datetime import datetime as dt
 
-from flask import Flask, request
+from flask import Flask, request, render_template
 from flask_cors import CORS
 from flask_restful import Api
-
-from src.resources import status
 
 app = Flask(__name__)
 app.logger.setLevel(logging.DEBUG)
@@ -47,6 +45,14 @@ if 'LOG_FOLDER' in os.environ:
         )
         return response
 
+from src.common.html_helpers import populate_team_table, populate_user_table
+
+
+@app.route('/')
+def home():
+    return render_template('index.html', team_table=populate_team_table(), user_table=populate_user_table())
+
+
 api = Api(app)
 
 # MONGO DRIVER CODE
@@ -57,8 +63,12 @@ app.config['MONGODB_SETTINGS'] = {
     'db': 'social'
 }
 
+from src.resources import status, user
+
 # Resources
 api.add_resource(status.Status, '/status')
+api.add_resource(user.CreateUser, '/create-user')
+api.add_resource(user.Login, '/admin/login')
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0', port=int(os.environ.get("PORT", 8000)))
