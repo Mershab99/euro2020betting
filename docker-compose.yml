@@ -41,7 +41,7 @@ services:
           - MONGO_PASSWORD=mershab99
           - LOG_FOLDER=/logs
           - MONGO_DB=dev
-          - PORT=8000
+          - PORT=8080
           - ROSTER_URL=https://soccer.nbcsports.com/2021/06/08/euro-2020-squads-full-list-details-confirmed/
         volumes:
             - ./service:/code
@@ -49,7 +49,7 @@ services:
         depends_on:
             - mongodb
         ports:
-          - 8000:8000
+          - 8080:8080
         networks:
         - traffic_net
 

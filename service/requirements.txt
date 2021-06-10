@@ -3,3 +3,4 @@ flask
 flask_restful 
 flask-cors
 flask_table
+requests
