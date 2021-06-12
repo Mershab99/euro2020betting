@@ -1,7 +1,7 @@
 import logging
 import os
 
-from flask import Flask, request, render_template, redirect
+from flask import Flask, request, render_template, redirect, session
 from flask_cors import CORS
 
 ADMIN_USER = os.environ['ADMIN_USERNAME']
@@ -11,6 +11,7 @@ app = Flask(__name__)
 app.logger.setLevel(logging.DEBUG)
 app.logger.info("Enabling CORS...")
 CORS(app)
+app.secret_key = 'secret'
 
 from src.common.html_helpers import populate_team_table, populate_user_table, populate_top_scorer_table, \
     populate_player_list, populate_team_list
@@ -27,6 +28,8 @@ def admin():
     username = request.form['username']
     password = request.form['password']
     if username == ADMIN_USER and password == ADMIN_PASSWORD:
+        session['username'] = username
+        session['password'] = password
         return render_template('admin.html')
     else:
         return redirect('/')
@@ -52,12 +55,10 @@ def create_user_post():
         create_user(first_name=data['first_name'], last_name=data['last_name'],
                     teams=[data['team1'], data['team2'], data['team3']],
                     player=data['player'])
-        return {
-            'message': 'success'
-        }
+        return redirect('/')
     except Exception:
         return {
-            'message': 'failure'
+            'message': 'its broke dawg'
         }
 
 
