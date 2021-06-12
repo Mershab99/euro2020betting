@@ -7,10 +7,10 @@
 <form action="/create-user-post/" method="post">
 
     <div>
-        <label for="first_name">First Name:</label>
+        <label for="first_name">First Name:</label><BR>
         <input type="text" id="first_name" name="first_name"><br>
-        <label for="last_name">Last Name:</label>
-        <input type="text" id="last_name" name="last_name">
+        <label for="last_name">Last Name:</label><BR>
+        <input type="text" id="last_name" name="last_name"><BR>
     </div>
     <div>
         <label for="player_select">Player:</label>
@@ -21,7 +21,8 @@
             {% endfor %}
         </select>
     </div>
-    <div>
+<br><br>
+        <div>
         <label for="team1_select">Team 1:</label>
         <select class="browser-default custom-select" id="team1_select" name="team1">
             {% for team in teams %}
@@ -29,6 +30,7 @@
             "
             {% endfor %}
         </select>
+<br><br>
         <label for="team2_select">Team 2:</label>
         <select class="browser-default custom-select" id="team2_select" name="team2">
             {% for team in teams %}
@@ -36,6 +38,7 @@
             "
             {% endfor %}
         </select>
+<br><br>
         <label for="team3_select">Team 3:</label>
         <select class="browser-default custom-select" id="team3_select" name="team3">
             {% for team in teams %}
@@ -44,6 +47,7 @@
             {% endfor %}
         </select>
     </div>
+<br><br>
     <div>
         <button type="submit" id="btn_submit2" name="submit">Create User!</button>
     </div>
