@@ -35,7 +35,7 @@ def admin():
 @app.route('/admin-post/', methods=['POST'])
 def admin_post():
     if 'create_user' in request.form:
-        return render_template('create_user.html', players=populate_player_list(), teams=populate_team_list())
+        return render_template('create_user.html', players=populate_player_list(), teams=populate_team_list(), user_table=populate_user_table())
     elif 'report_scores' in request.form:
         return render_template('report_scores.html', players=populate_player_list(), teams=populate_team_list())
 
